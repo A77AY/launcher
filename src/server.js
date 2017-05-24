@@ -1,8 +1,10 @@
 const express = require('express');
+const markup = require('./layout/markup');
+
 const app = express();
 
 app.get('/', function (req, res) {
-    res.send('Hello world')
+    res.send(markup);
 });
 
 app.listen(3000, 'localhost', function () {
