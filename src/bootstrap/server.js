@@ -1,5 +1,5 @@
 const express = require('express');
-const markup = require('./layout/markup');
+const markup = require('../layout/markup');
 
 const app = express();
 
