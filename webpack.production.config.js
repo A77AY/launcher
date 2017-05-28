@@ -12,8 +12,6 @@ module.exports = {
         publicPath: '/static/'
     },
 
-    devtool: 'inline-source-map',
-
     module: {
         rules: [
             {
