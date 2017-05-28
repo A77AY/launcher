@@ -20,16 +20,12 @@ module.exports = {
                 test: /\.jsx?$/,
                 use: [
                     'babel-loader',
-                ],
-                exclude: /node_modules/
+                ]
             },
         ],
     },
 
     plugins: [
-        new webpack.HotModuleReplacementPlugin(),
-        new webpack.NamedModulesPlugin(),
-        new webpack.NoEmitOnErrorsPlugin(),
     ],
 
     resolve: {
