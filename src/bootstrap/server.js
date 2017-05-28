@@ -38,7 +38,7 @@ api.post('/getSome', function (req, res) {
     const {ids, length} = req.body;
     const commands = {};
     for (let id of ids) {
-        commands[id] = store[id].get();
+        if(store[id]) commands[id] = store[id].get();
     }
     if (ids.length !== store.length) {
         for (let i = length; i < store.length; ++i) {

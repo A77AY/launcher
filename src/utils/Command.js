@@ -11,8 +11,6 @@ module.exports = class {
     }
 
     launch() {
-
-        console.log(this.name);
         //const process = this.process = cp.exec(this.name);//spawn('ls', ['-lh', '/usr']);
 
         const process = this.process = cp.exec(this.name, (error, stdout, stderr) => {

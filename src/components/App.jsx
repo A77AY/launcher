@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Menu, Container, Form, Button, Table, Header, Icon} from 'semantic-ui-react'
+import {Menu, Container, Form, Button, Table, Header, Icon, Progress} from 'semantic-ui-react'
 import STATUS from '../const/status'
 
 export default class App extends Component {
@@ -10,7 +10,9 @@ export default class App extends Component {
         form: {
             command: '',
             comment: ''
-        }
+        },
+        launch: -1,
+        submit: false
     };
 
     static PAGES = {
@@ -27,7 +29,8 @@ export default class App extends Component {
     }
 
     render() {
-        const {activeItem, commands, form} = this.state;
+        const {activeItem, commands, form, launch, submit} = this.state;
+        const loadCommand = commands[launch] || null;
         return (
             <div style={{margin: '30px 0'}}>
                 <Container>
@@ -42,14 +45,37 @@ export default class App extends Component {
                         <Header as='h1'>Запуск утилит</Header>
                         <Form onSubmit={this.handleSubmit}>
                             <Form.Group widths='equal'>
-                                <Form.Input defaultValue={form.command}
-                                            onInput={e => this.setState({form: {...form, command: e.target.value}})}
-                                            label='Команда' placeholder="Например 'ls -la'"/>
-                                <Form.Input defaultValue={form.comment}
-                                            onInput={e => this.setState({form: {...form, comment: e.target.value}})}
-                                            label='Комментарий' placeholder=''/>
+                                <Form.Input
+                                    defaultValue={form.command}
+                                    value={form.command}
+                                    onInput={e => this.setState({form: {...form, command: e.target.value}})}
+                                    label='Команда'
+                                    placeholder="Например 'ls -la'"
+                                    disabled={submit}
+                                />
+                                <Form.Input
+                                    defaultValue={form.comment}
+                                    value={form.comment}
+                                    onInput={e => this.setState({form: {...form, comment: e.target.value}})}
+                                    label='Комментарий'
+                                    placeholder=''
+                                    disabled={submit}
+                                />
                             </Form.Group>
-                            <Form.Button>Запустить</Form.Button>
+                            <Form.Button loading={submit}>Запустить</Form.Button>
+                            { loadCommand &&
+                            <Progress
+                                percent={
+                                    loadCommand.status === STATUS.PROCESS
+                                        ? submit ? 0 : 50
+                                        : 100
+                                }
+                                active={loadCommand.status === STATUS.PROCESS}
+                                indicating={loadCommand.status === STATUS.PROCESS}
+                                success={loadCommand.status === STATUS.COMPLETE}
+                                error={loadCommand.status === STATUS.ERROR}
+                            >{loadCommand.name}<br/>{loadCommand.comment && `(${loadCommand.comment})`}</Progress>
+                            }
                         </Form>
                     </Container>
                     }
@@ -106,11 +132,11 @@ export default class App extends Component {
                                                     {/*}*/}
                                                 </Table.Cell>
                                                 <Table.Cell>
-                                                    {command.updateTime.toLocaleString("ru", {
+                                                    {command.updateTime ? command.updateTime.toLocaleString("ru", {
                                                         hour: "numeric",
                                                         minute: "numeric",
                                                         second: "numeric"
-                                                    })}
+                                                    }) : '-'}
                                                     {/*<Button basic>Обновить</Button>*/}
                                                 </Table.Cell>
                                             </Table.Row>
@@ -141,11 +167,20 @@ export default class App extends Component {
 
     handleSubmit = e => {
         e.preventDefault();
+        const launch = this.state.commands.length;
+        const command = {
+            name: this.state.form.command,
+            comment: this.state.form.comment,
+            status: STATUS.PROCESS
+        };
         this.setState({
             form: {
                 command: '',
                 comment: ''
-            }
+            },
+            launch: launch,
+            commands: [...this.state.commands, command],
+            submit: true
         });
         fetch("/api/push", {
             method: "put",
@@ -158,9 +193,15 @@ export default class App extends Component {
             .then((res) => {
                 return res.text();
             })
+            .catch(e => {
+                this.setState({commands: this.state.commands.slice(0, launch), submit: false});
+            })
             .then((command) => {
-                command = this.commandsParse(command);
-                this.setState({commands: [...this.state.commands, command]})
+                this.state.commands[launch] = this.commandsParse(command);
+                this.setState({commands: [...this.state.commands], submit: false});
+            })
+            .catch(e => {
+                this.setState({commands: this.state.commands.slice(0, launch), submit: false});
             });
     };
 
