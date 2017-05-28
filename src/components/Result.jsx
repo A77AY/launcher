@@ -54,6 +54,9 @@ export default class Result extends React.Component {
                                         </Table.Cell>
                                         <Table.Cell>
                                             {command.endTime ? command.endTime.toLocaleString("ru", {
+                                                year: "numeric",
+                                                month: "numeric",
+                                                day: "numeric",
                                                 hour: "numeric",
                                                 minute: "numeric",
                                                 second: "numeric"
@@ -61,6 +64,9 @@ export default class Result extends React.Component {
                                         </Table.Cell>
                                         <Table.Cell>
                                             {command.updateTime ? command.updateTime.toLocaleString("ru", {
+                                                year: "numeric",
+                                                month: "numeric",
+                                                day: "numeric",
                                                 hour: "numeric",
                                                 minute: "numeric",
                                                 second: "numeric"
