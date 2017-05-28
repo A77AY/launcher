@@ -176,7 +176,6 @@ export default class App extends Component {
     };
 
     updateProcessedLoop() {
-        this.commandsTimers
         setTimeout(() => {
             const {commands} = this.state;
             const processedCommandsIds = [];
