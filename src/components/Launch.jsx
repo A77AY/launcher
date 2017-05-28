@@ -1,5 +1,5 @@
 import React from 'react'
-import {Menu, Container, Form, Button, Table, Header, Icon, Progress} from 'semantic-ui-react'
+import {Container, Form, Header, Progress} from 'semantic-ui-react'
 import STATUS from '../const/status'
 
 export default class Launch extends React.Component {

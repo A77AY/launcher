@@ -1,19 +1,14 @@
 import React, {Component} from 'react';
-import {Menu, Container, Form, Button, Table, Header, Icon, Progress} from 'semantic-ui-react'
+import {Menu, Container} from 'semantic-ui-react'
 import STATUS from '../const/status'
 import Launch from './Launch'
+import Result from "./Result";
 
 export default class App extends Component {
 
     state = {
         activeItem: App.PAGES.RESULT,
-        commands: [],
-        form: {
-            command: '',
-            comment: ''
-        },
-        launch: -1,
-        submit: false
+        commands: []
     };
 
     static PAGES = {
@@ -38,74 +33,7 @@ export default class App extends Component {
                                    onClick={this.handleItemClick}/>
                     </Menu>
                     { activeItem === App.PAGES.LAUNCH && <Launch commands={commands} setCommands={this.setCommands}/>}
-                    { activeItem === App.PAGES.RESULT &&
-                    <Container>
-                        <Header as='h1'>Результаты</Header>
-                        <Table celled padded style={{tableLayout: 'fixed'}}>
-                            <Table.Header>
-                                <Table.Row>
-                                    <Table.HeaderCell>Команда</Table.HeaderCell>
-                                    <Table.HeaderCell>Комментарий</Table.HeaderCell>
-                                    <Table.HeaderCell>Статус</Table.HeaderCell>
-                                    <Table.HeaderCell>Вывод</Table.HeaderCell>
-                                    <Table.HeaderCell>Время завершения выполнения</Table.HeaderCell>
-                                    <Table.HeaderCell>Обновление</Table.HeaderCell>
-                                </Table.Row>
-                            </Table.Header>
-
-                            <Table.Body style={{width: '100%'}}>
-                                {
-                                    commands.map((command, id) => {
-                                        return (
-                                            <Table.Row
-                                                key={id}
-                                                warning={command.status === STATUS.PROCESS}
-                                                error={command.status === STATUS.ERROR}
-                                                positive={command.status === STATUS.COMPLETE}
-                                                style={{verticalAlign: 'top'}}
-                                            >
-                                                <Table.Cell>
-                                                    <pre style={{margin: 0}}>{command.name}</pre>
-                                                </Table.Cell>
-                                                <Table.Cell>
-                                                    <div style={{maxHeight: 200, overflow: 'auto'}}>
-                                                        {command.comment}
-                                                    </div>
-                                                </Table.Cell>
-                                                <Table.Cell singleLine>
-                                                    <Icon name='attention'/>
-                                                    {command.status}
-                                                </Table.Cell>
-                                                <Table.Cell style={{overflow: 'auto'}}>
-                                                    <pre style={{margin: 0, maxHeight: 200}}>{command.output}</pre>
-                                                </Table.Cell>
-                                                <Table.Cell>
-                                                    {command.endTime ? command.endTime.toLocaleString("ru", {
-                                                        hour: "numeric",
-                                                        minute: "numeric",
-                                                        second: "numeric"
-                                                    }) : '-'}
-                                                    {/*{*/}
-                                                    {/*command.status === STATUS.PROCESS &&*/}
-                                                    {/*<Button basic onClick={e=>this.kill(id)}>Остановить</Button>*/}
-                                                    {/*}*/}
-                                                </Table.Cell>
-                                                <Table.Cell>
-                                                    {command.updateTime ? command.updateTime.toLocaleString("ru", {
-                                                        hour: "numeric",
-                                                        minute: "numeric",
-                                                        second: "numeric"
-                                                    }) : '-'}
-                                                    {/*<Button basic>Обновить</Button>*/}
-                                                </Table.Cell>
-                                            </Table.Row>
-                                        )
-                                    })
-                                }
-                            </Table.Body>
-                        </Table>
-                    </Container>
-                    }
+                    { activeItem === App.PAGES.RESULT && <Result commands={commands}/>}
                 </Container>
             </div>
         );
@@ -126,17 +54,6 @@ export default class App extends Component {
                 commands = this.commandsParse(commands);
                 this.setState({commands});
             });
-    };
-
-    kill = (id) => {
-        fetch("/api/kill", {
-            method: "post",
-            body: JSON.stringify({id: id}),
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        });
     };
 
     updateProcessedLoop() {
