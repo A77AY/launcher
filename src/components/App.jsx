@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Menu, Container, Form, Button, Table, Header, Icon, Progress} from 'semantic-ui-react'
 import STATUS from '../const/status'
+import Launch from './Launch'
 
 export default class App extends Component {
 
@@ -20,17 +21,13 @@ export default class App extends Component {
         RESULT: 'Результат'
     };
 
-
-    commandsTimers = [];
-
     componentDidMount() {
         this.load();
         this.updateProcessedLoop();
     }
 
     render() {
-        const {activeItem, commands, form, launch, submit} = this.state;
-        const loadCommand = commands[launch] || null;
+        const {activeItem, commands} = this.state;
         return (
             <div style={{margin: '30px 0'}}>
                 <Container>
@@ -40,45 +37,7 @@ export default class App extends Component {
                         <Menu.Item name={App.PAGES.RESULT} active={activeItem === App.PAGES.RESULT}
                                    onClick={this.handleItemClick}/>
                     </Menu>
-                    { activeItem === App.PAGES.LAUNCH &&
-                    <Container>
-                        <Header as='h1'>Запуск утилит</Header>
-                        <Form onSubmit={this.handleSubmit}>
-                            <Form.Group widths='equal'>
-                                <Form.Input
-                                    defaultValue={form.command}
-                                    value={form.command}
-                                    onInput={e => this.setState({form: {...form, command: e.target.value}})}
-                                    label='Команда'
-                                    placeholder="Например 'ls -la'"
-                                    disabled={submit}
-                                />
-                                <Form.Input
-                                    defaultValue={form.comment}
-                                    value={form.comment}
-                                    onInput={e => this.setState({form: {...form, comment: e.target.value}})}
-                                    label='Комментарий'
-                                    placeholder=''
-                                    disabled={submit}
-                                />
-                            </Form.Group>
-                            <Form.Button loading={submit}>Запустить</Form.Button>
-                            { loadCommand &&
-                            <Progress
-                                percent={
-                                    loadCommand.status === STATUS.PROCESS
-                                        ? submit ? 0 : 50
-                                        : 100
-                                }
-                                active={loadCommand.status === STATUS.PROCESS}
-                                indicating={loadCommand.status === STATUS.PROCESS}
-                                success={loadCommand.status === STATUS.COMPLETE}
-                                error={loadCommand.status === STATUS.ERROR}
-                            >{loadCommand.name}<br/>{loadCommand.comment && `(${loadCommand.comment})`}</Progress>
-                            }
-                        </Form>
-                    </Container>
-                    }
+                    { activeItem === App.PAGES.LAUNCH && <Launch commands={commands} setCommands={this.setCommands}/>}
                     { activeItem === App.PAGES.RESULT &&
                     <Container>
                         <Header as='h1'>Результаты</Header>
@@ -152,6 +111,10 @@ export default class App extends Component {
         );
     }
 
+    setCommands = (commands) => {
+        this.setState({commands: commands});
+    };
+
     handleItemClick = (e, {name}) => this.setState({activeItem: name});
 
     load = () => {
@@ -162,46 +125,6 @@ export default class App extends Component {
             .then((commands) => {
                 commands = this.commandsParse(commands);
                 this.setState({commands});
-            });
-    };
-
-    handleSubmit = e => {
-        e.preventDefault();
-        const launch = this.state.commands.length;
-        const command = {
-            name: this.state.form.command,
-            comment: this.state.form.comment,
-            status: STATUS.PROCESS
-        };
-        this.setState({
-            form: {
-                command: '',
-                comment: ''
-            },
-            launch: launch,
-            commands: [...this.state.commands, command],
-            submit: true
-        });
-        fetch("/api/push", {
-            method: "put",
-            body: JSON.stringify(this.state.form),
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        })
-            .then((res) => {
-                return res.text();
-            })
-            .catch(e => {
-                this.setState({commands: this.state.commands.slice(0, launch), submit: false});
-            })
-            .then((command) => {
-                this.state.commands[launch] = this.commandsParse(command);
-                this.setState({commands: [...this.state.commands], submit: false});
-            })
-            .catch(e => {
-                this.setState({commands: this.state.commands.slice(0, launch), submit: false});
             });
     };
 
