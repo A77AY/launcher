@@ -1,13 +1,14 @@
 {
   "name": "launcher",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "./src/server.js",
   "scripts": {
-    "start": "npm run dev",
+    "start": "cross-env NODE_ENV=production node ./src/bootstrap/server",
     "dev": "concurrently --kill-others \"npm start dev-server\"  \"npm start dev-client\"",
     "dev-server": "cross-env NODE_ENV=development node ./src/bootstrap/server",
     "dev-client": "cross-env NODE_ENV=development webpack-dev-server",
+    "build": "cross-env NODE_ENV=production webpack -p --config webpack.production.config.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Rinat Arsaev <krickray@gmail.com>",
@@ -23,12 +24,13 @@
   "devDependencies": {
     "babel-core": "^6.24.1",
     "babel-loader": "^7.0.0",
+    "babel-preset-babili": "^0.1.2",
     "babel-preset-env": "^1.5.1",
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "concurrently": "^3.4.0",
     "react-hot-loader": "^3.0.0-beta.7",
-    "webpack": "^2.6.0",
+    "webpack": "^2.6.1",
     "webpack-dev-server": "^2.4.5"
   }
 }

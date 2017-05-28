@@ -7,6 +7,6 @@ module.exports = `<!doctype html>
 </head>
 <body>
     <div id='root'></div>
-    <script src="//localhost:3001/static/bundle.js"></script>
+    <script src="${process.env.NODE_ENV === 'development' ? '//localhost:3001' : ''}/static/bundle.js"></script>
 </body>
 </html>`;

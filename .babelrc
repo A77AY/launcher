@@ -5,7 +5,9 @@
       {
         "modules": false,
         "targets": {
-          "browsers": ["> 1%"]
+          "browsers": [
+            "> 1%"
+          ]
         }
       }
     ],
@@ -13,6 +15,21 @@
     "react"
   ],
   "plugins": [
-    "react-hot-loader/babel"
-  ]
+  ],
+  "env": {
+    "development": {
+      "plugins": [
+        "react-hot-loader/babel"
+      ]
+    },
+    "production": {
+      "presets": [
+        ["babili", {
+          "mangle": false,
+          "removeConsole": true,
+          "removeDebugger": true
+        }]
+      ]
+    }
+  }
 }

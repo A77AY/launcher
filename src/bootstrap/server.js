@@ -13,6 +13,8 @@ app.get('/', function (req, res) {
     res.send(markup);
 });
 
+app.use('/static', express.static(process.cwd() + '/static'));
+
 // API
 
 // parse application/json
