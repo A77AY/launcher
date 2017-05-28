@@ -10,7 +10,7 @@ npm i
 
 ## Start in production environment
 ```
-npm run prod
+npm start
 ```
 
 ## Start in development environment
